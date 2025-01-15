@@ -11,6 +11,10 @@ const options = {
     },
     servers: [
       {
+        url: 'https://progress-tracker-kocb.onrender.com',
+        description: 'Deployed web service url'
+      },
+      {
         url: 'http://localhost:8000',
         description: 'Local server'
       }
