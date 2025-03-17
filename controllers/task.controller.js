@@ -22,6 +22,8 @@ const createTask = async (req, res, next) => {
 const getAllTasks = async (req, res, next) => {
   
   const { from, to } = req.query;
+  const page = +req.query.page;
+  const limit = +req.query.limit;
   
   try {
 
@@ -40,9 +42,20 @@ const getAllTasks = async (req, res, next) => {
       filter.createdAt = dateObj;
     }
 
-    const tasks = await Task.find(filter);
+    const totalItems = await Task.find(filter).countDocuments();
+    const totalPages = (Math.floor(totalItems/limit) + 1); 
 
-    return res.status(200).json(tasks);
+    const tasks = await Task.find(filter).skip((page - 1) * limit).limit(limit);
+
+    return res.status(200).json({
+      items: tasks,
+      meta: {
+        page,
+        itemsPerPage: limit,
+        totalPages,
+        totalItems
+      }
+    });
 
   } catch (err) {
     next(err)
@@ -51,24 +64,34 @@ const getAllTasks = async (req, res, next) => {
 
 const getTotalDuration = async (req, res, next) => {
   
-  const { from, to } = req.query;
+  const { from, to, currentDay } = req.query;
 
   try {
 
     let dateObj = {}
-
-    if (from) {
-      dateObj["$gte"] = new Date(from);
-    }
-
-    if (to) {
-      dateObj["$lte"] = new Date(to);
-    }
-
     let filter = {}
 
-    if (from || to) {
-      filter.createdAt = dateObj;
+    const currentDate = (currentDay === true || currentDay === 'true')? true: false;
+
+    if (currentDate) {
+
+      dateObj["$gte"] = new Date().toISOString().slice(0,10)
+      filter.createdAt = dateObj
+
+    } else {
+
+      if (from) {
+        dateObj["$gte"] = new Date(from);
+      }
+  
+      if (to) {
+        dateObj["$lte"] = new Date(to);
+      }
+
+      if (from || to) {
+        filter.createdAt = dateObj;
+      }
+
     }
 
     const tasks = await Task.find(filter);

@@ -63,6 +63,16 @@ router.post('/', createTask)
  *        description: upper limit of date filter
  *        schema:
  *          type: string
+ *      - in: query
+ *        name: page
+ *        description: Page number
+ *        schema:
+ *          type: number
+ *      - in: query
+ *        name: limit
+ *        description: No of items per page
+ *        schema:
+ *          type: number
  *     responses:
  *      200:
  *        description: Successfully retrieves tasks 
@@ -90,6 +100,11 @@ router.get('/', getAllTasks)
  *        description: upper limit of date filter
  *        schema:
  *          type: string
+ *      - in: query
+ *        name: currentDay
+ *        description: Returns duration worked for the current day
+ *        schema:
+ *          type: boolean
  *     responses:
  *      200:
  *        description: Successfully returns total duration
